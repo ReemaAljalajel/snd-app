@@ -127,3 +127,5 @@ prompt.template = tem
 
 agent = create_react_agent(openia_model, prompt=prompt, tools=tools )
 agent_executor=AgentExecutor(agent=agent, tools=tools, verbose=True, max_iterations=5, handle_parsing_errors=True , memory=memory) # AgentType=AgentType.CHAT_CONVERSATIONAL_REACT_DESCRIPTION
+
+
