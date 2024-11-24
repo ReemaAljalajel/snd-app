@@ -5,6 +5,7 @@ from typing import Any, List, Union
 from langchain_core.messages import AIMessage, HumanMessage
 from pydantic import BaseModel, Field
 from agent import agent_executor
+import os
 
 
 class Input(BaseModel):
@@ -32,4 +33,5 @@ add_routes(
 )
 
 if __name__ == "__main__":
-    uvicorn.run(app, host="localhost", port=8001)
+    port = int(os.environ.get("PORT", 8002)) 
+    uvicorn.run(app, host="0.0.0.0", port=port)
