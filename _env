@@ -1,0 +1,7 @@
+
+
+LANGCHAIN_TRACING_V2=true
+LANGCHAIN_ENDPOINT="https://api.smith.langchain.com"
+LANGCHAIN_API_KEY="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"
+LANGCHAIN_PROJECT="SND_chatbot"
+
