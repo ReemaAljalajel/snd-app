@@ -23,7 +23,7 @@ openia_model = ChatOpenAI(
 )
 
 memory=ConversationBufferWindowMemory(memory_key="chat_history",return_messages=True,k=3) # We set a low k=3, to only keep the last 3 interactions in memory
-memory2=ConversationBufferWindowMemory(memory_key="chat_history",return_messages=True,k=0) # We set a low k=3, to only keep the last 3 interactions in memory
+memory2=ConversationBufferWindowMemory(memory_key="chat_history",return_messages=True,k=1) # We set a low k=3, to only keep the last 3 interactions in memory
 
 # Directory where the database will be saved for persistence
 persist_directory = 'db'

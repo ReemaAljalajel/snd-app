@@ -11,10 +11,7 @@ import os
 
 class Input(BaseModel):
     input: str
-    # chat_history: List[Union[HumanMessage, AIMessage]] = Field(
-    #     ...,
-    #     extra={"widget": {"type": "chat", "input": "input", "output": "output"}},
-    # )
+
 
 
 class Output(BaseModel):
