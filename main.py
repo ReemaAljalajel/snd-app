@@ -5,6 +5,7 @@ from typing import Any, List, Union
 from langchain_core.messages import AIMessage, HumanMessage
 from pydantic import BaseModel, Field
 from agent import agent_executor
+from agent import agent_executor2
 import os
 
 
@@ -34,7 +35,7 @@ add_routes(
 
 add_routes(
     app,
-    agent_executor.with_types(input_type=Input, output_type=Output),
+    agent_executor2.with_types(input_type=Input, output_type=Output),
     path="/chatbot",
 )
 
