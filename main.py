@@ -32,6 +32,12 @@ add_routes(
     path="/invoke",
 )
 
+add_routes(
+    app,
+    agent_executor.with_types(input_type=Input, output_type=Output),
+    path="/chatbot",
+)
+
 if __name__ == "__main__":
 
     uvicorn.run(app)

@@ -23,6 +23,7 @@ openia_model = ChatOpenAI(
 )
 
 memory=ConversationBufferWindowMemory(memory_key="chat_history",return_messages=True,k=3) # We set a low k=3, to only keep the last 3 interactions in memory
+memory2=ConversationBufferWindowMemory(memory_key="chat_history",return_messages=True,k=0) # We set a low k=3, to only keep the last 3 interactions in memory
 
 # Directory where the database will be saved for persistence
 persist_directory = 'db'
@@ -128,4 +129,4 @@ prompt.template = tem
 agent = create_react_agent(openia_model, prompt=prompt, tools=tools )
 agent_executor=AgentExecutor(agent=agent, tools=tools, verbose=True, max_iterations=5, handle_parsing_errors=True , memory=memory) # AgentType=AgentType.CHAT_CONVERSATIONAL_REACT_DESCRIPTION
 
-
+agent_executor2=AgentExecutor(agent=agent, tools=tools, verbose=True, max_iterations=5, handle_parsing_errors=True , memory=memory2)
