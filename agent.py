@@ -1,7 +1,6 @@
 from langchain import hub
 from langchain.agents import AgentExecutor, create_react_agent
 from langchain.agents import AgentExecutor
-import os
 from langchain_openai import ChatOpenAI
 from langchain.chat_models import ChatOpenAI
 from langchain.chains import RetrievalQA
@@ -10,23 +9,43 @@ from langchain.vectorstores import Chroma
 from langchain.embeddings import OpenAIEmbeddings
 from langchain.memory import ConversationBufferWindowMemory
 from dotenv import load_dotenv 
+from langchain.document_loaders import TextLoader
+from langchain.document_loaders import DirectoryLoader
 
-
+# Load Environment Variables
 load_dotenv(dotenv_path=".env",override=True)
-print(os.getenv("LANGCHAIN_PROJECT")) 
 
-
+# Initialize OpenAI Model (gpt-4)
 openia_model = ChatOpenAI(
     model="gpt-4",
     temperature=0 #controls randomness in output
 
 )
 
+# - This memory object is used for the testing environment.
+#   allowing us to evaluate the context-sensitive responses of the agent.
 memory=ConversationBufferWindowMemory(memory_key="chat_history",return_messages=True,k=3) # We set a low k=3, to only keep the last 3 interactions in memory
-memory2=ConversationBufferWindowMemory(memory_key="chat_history",return_messages=True,k=1) # We set a low k=3, to only keep the last 3 interactions in memory
+
+# - This memory object is used in the deployed app.
+# - It does not store interactions persistently because the app sends the
+#   full history for each user as required. 
+# - This separation ensures that users interactions do not conflict,
+#   maintaining individual user sessions and personalized responses.
+memory2=ConversationBufferWindowMemory(memory_key="chat_history",return_messages=True,k=1) 
+memory3=ConversationBufferWindowMemory(memory_key="chat_history",return_messages=True,k=0) 
+
+#---------------------------------------------------------------------------------------------------------------------------------------------------
+
+## RAG (Retrieval-Augmented Generation) Configuration :
 
 # Directory where the database will be saved for persistence
 persist_directory = 'db'
+
+# Load text files
+loader = DirectoryLoader('./RAG', glob="./*.txt", loader_cls=TextLoader)
+
+# Load the documents using the DirectoryLoader
+documents = loader.load()
 
 # Initialize theOpenAI embedding 
 embedding = OpenAIEmbeddings()
@@ -35,6 +54,10 @@ embedding = OpenAIEmbeddings()
 vectordb = Chroma(persist_directory=persist_directory, 
                   embedding_function=embedding,
                    )
+
+# persiste the db to disk
+vectordb.persist()
+
 # Create a retriever from the vector database
 retriever = vectordb.as_retriever(search_kwargs={"k": 1}) # the retriever will return the top 1 most similar result (k=1)
 
@@ -55,6 +78,9 @@ description=("Use this tool to answer medical knowledge queries. you must answer
 tools=[RAG_tool]
 tool_names=["RAG_tool"]
 
+#---------------------------------------------------------------------------------------------------------------------------------------------------
+
+#This section defines the prompt for the mental health support chatbot :
 tem = """
 Your name is SND Chatbot. You are a mental health support chatbot designed only for university students. Your role is to provide compassionate and professional responses to help students feel better, share their emotions, and talk about their day. Your primary focus is to encourage students to speak out more and provide support through positive and empathetic communication. When initializing a conversation, always ask about the student day, introduce yourself and mention that your role is to help.
 
@@ -126,7 +152,23 @@ prompt = hub.pull("hwchase17/react-chat")
 prompt.template = tem    
 
 
-agent = create_react_agent(openia_model, prompt=prompt, tools=tools )
-agent_executor=AgentExecutor(agent=agent, tools=tools, verbose=True, max_iterations=5, handle_parsing_errors=True , memory=memory) # AgentType=AgentType.CHAT_CONVERSATIONAL_REACT_DESCRIPTION
+# Chatbot Agent and Executor Configurtion
 
+# Agent Definition:
+# - create_react_agent: Initializes the agent with the specified OpenAI model,
+#   a custom prompt, and our tool to perform tasks.
+agent = create_react_agent(openia_model, prompt=prompt, tools=tools )
+
+# First Executor:
+# - Used for testing purposes 
+# - Memory: (ConversationBufferWindowMemory) is configured to retain only
+#   the last 3 interactions to ensure concise context while testing.
+agent_executor=AgentExecutor(agent=agent, tools=tools, verbose=True, max_iterations=5, handle_parsing_errors=True , memory=memory) 
+
+# Second Executor:
+# - Deployed in SND app.
+# - Memory: (ConversationBufferWindowMemory) is configured with `k=0`,
+#   meaning it does not retain any memory persistently. The app dynamically sends
+#   the full history per user as needed.
 agent_executor2=AgentExecutor(agent=agent, tools=tools, verbose=True, max_iterations=5, handle_parsing_errors=True , memory=memory2)
+agent_executor3=AgentExecutor(agent=agent, tools=tools, verbose=True, max_iterations=5, handle_parsing_errors=True , memory=memory3)
