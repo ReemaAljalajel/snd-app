@@ -5,7 +5,7 @@ from typing import Any
 from pydantic import BaseModel
 from agent import agent_executor
 from agent import agent_executor2
-
+from agent import agent_executor3
 
 
 # This class Defines the structure of the input expected by the API.
@@ -46,7 +46,7 @@ add_routes(
 #   2. `/chatbot`: Maps to `agent_executor2`, which is deployed in production.
 add_routes(
     app,
-    agent_executor2.with_types(input_type=Input, output_type=Output),
+    agent_executor3.with_types(input_type=Input, output_type=Output),
     path="/chatbot2",
 )
 
