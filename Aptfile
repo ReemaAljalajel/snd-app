@@ -7,3 +7,9 @@ libatlas-base-dev
 libopenblas-dev
 liblapack-dev
 gcc
+gfortran
+libgfortran5
+libatlas-base-dev
+libopenblas-dev
+liblapack-dev
+gcc
