@@ -11,8 +11,10 @@ from langchain.memory import ConversationBufferWindowMemory
 from dotenv import load_dotenv 
 from langchain.document_loaders import TextLoader
 from langchain.document_loaders import DirectoryLoader
+import os
 
 # Load Environment Variables
+
 load_dotenv(dotenv_path=".env",override=True)
 
 # Initialize OpenAI Model (gpt-4)
@@ -56,7 +58,7 @@ vectordb = Chroma(persist_directory=persist_directory,
                    )
 
 # persiste the db to disk
-vectordb.persist()
+#vectordb.persist()
 
 # Create a retriever from the vector database
 retriever = vectordb.as_retriever(search_kwargs={"k": 1}) # the retriever will return the top 1 most similar result (k=1)
@@ -172,3 +174,5 @@ agent_executor=AgentExecutor(agent=agent, tools=tools, verbose=True, max_iterati
 #   the full history per user as needed.
 agent_executor2=AgentExecutor(agent=agent, tools=tools, verbose=True, max_iterations=5, handle_parsing_errors=True , memory=memory2)
 agent_executor3=AgentExecutor(agent=agent, tools=tools, verbose=True, max_iterations=5, handle_parsing_errors=True , memory=memory3)
+
+agent_executor.invoke({"input": "What is stress?"})
