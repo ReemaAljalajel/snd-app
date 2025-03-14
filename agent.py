@@ -41,7 +41,7 @@ memory3=ConversationBufferWindowMemory(memory_key="chat_history",return_messages
 ## RAG (Retrieval-Augmented Generation) Configuration :
 
 # Directory where the database will be saved for persistence
-persist_directory = 'db'
+persist_directory = 'db2'
 
 # Load text files
 loader = DirectoryLoader('./RAG', glob="./*.txt", loader_cls=TextLoader)
@@ -53,9 +53,16 @@ documents = loader.load()
 embedding = OpenAIEmbeddings()
 
 # Create a Chroma vector database from the loaded documents
-vectordb = Chroma(persist_directory=persist_directory, 
-                  embedding_function=embedding,
-                   )
+# vectordb = Chroma(persist_directory=persist_directory, 
+#                   embedding_function=embedding,
+#                    )
+from langchain.text_splitter import RecursiveCharacterTextSplitter
+text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=200)
+texts = text_splitter.split_documents(documents)
+
+vectordb = Chroma.from_documents(documents=texts, 
+                                 embedding=embedding,
+                                 persist_directory=persist_directory)
 
 # persiste the db to disk
 #vectordb.persist()
@@ -175,4 +182,4 @@ agent_executor=AgentExecutor(agent=agent, tools=tools, verbose=True, max_iterati
 agent_executor2=AgentExecutor(agent=agent, tools=tools, verbose=True, max_iterations=5, handle_parsing_errors=True , memory=memory2)
 agent_executor3=AgentExecutor(agent=agent, tools=tools, verbose=True, max_iterations=5, handle_parsing_errors=True , memory=memory3)
 
-agent_executor.invoke({"input": "What is stress?"})
+agent_executor.invoke({"input": "How to manage and deal with stress?"})
